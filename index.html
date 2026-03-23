@@ -355,42 +355,92 @@
       font-weight: 400;
     }
 
-    /* Projects */
+    /* Projects / Timeline */
     #projects { background: var(--paper-warm); }
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
+
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 5rem;
+      top: 0.5rem;
+      bottom: 0;
+      width: 1px;
+      background: var(--line);
     }
-    .project-card {
+    .timeline-group {
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      margin-bottom: 5rem;
+      position: relative;
+    }
+    .timeline-group:last-child { margin-bottom: 0; }
+    .timeline-year-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      text-align: right;
+      padding-right: 1.6rem;
+      padding-top: 0.1rem;
+      position: relative;
+    }
+    .timeline-year-label::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 0.32rem;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .timeline-projects {
+      padding-left: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+    .timeline-project {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .project-visual {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
       background: var(--paper);
       border: 1px solid var(--line);
-      padding: 3rem;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-      transition: background 0.3s;
     }
-    .project-card--wide {
-      grid-column: 1 / -1;
+    .project-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.5s;
+      filter: grayscale(100%) sepia(20%) contrast(1.05);
     }
-    .project-card:hover { background: var(--ink); }
-    .project-card:hover .project-num,
-    .project-card:hover .project-award,
-    .project-card:hover .project-title,
-    .project-card:hover .project-desc,
-    .project-card:hover .project-tags span,
-    .project-card:hover .project-link { color: var(--paper); }
-    .project-card:hover .project-tags span { border-color: rgba(245,243,239,0.3); }
-    .project-card:hover .project-bar { background: var(--paper); }
-
+    .project-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+    }
+    .timeline-project:hover .project-canvas { opacity: 1; }
+    .timeline-project:hover .project-visual img { opacity: 0.15; }
+    .project-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 0.25rem;
+    }
     .project-num {
       font-family: var(--mono);
       font-size: 0.6rem;
       letter-spacing: 0.12em;
       color: var(--ink-muted);
-      margin-bottom: 0.6rem;
-      transition: color 0.3s;
     }
     .project-award {
       font-family: var(--mono);
@@ -398,30 +448,24 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--ink-muted);
-      margin-bottom: 1.4rem;
-      transition: color 0.3s;
     }
     .project-title {
       font-size: 1.6rem;
       font-weight: 300;
       letter-spacing: -0.01em;
-      margin-bottom: 1rem;
-      transition: color 0.3s;
+      line-height: 1.1;
     }
     .project-title em { font-style: italic; }
     .project-desc {
       font-size: 0.95rem;
       line-height: 1.7;
       color: var(--ink-soft);
-      margin-bottom: 2rem;
       font-weight: 300;
-      transition: color 0.3s;
     }
     .project-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      margin-bottom: 2.5rem;
     }
     .project-tags span {
       font-family: var(--mono);
@@ -430,16 +474,7 @@
       padding: 0.3rem 0.7rem;
       border: 1px solid var(--line);
       color: var(--ink-soft);
-      transition: color 0.3s, border-color 0.3s;
     }
-    .project-bar {
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 0; height: 2px;
-      background: var(--ink);
-      transition: width 0.4s cubic-bezier(.25,.46,.45,.94), background 0.3s;
-    }
-    .project-card:hover .project-bar { width: 100%; }
     .project-link {
       font-family: var(--mono);
       font-size: 0.62rem;
@@ -447,7 +482,36 @@
       text-transform: uppercase;
       color: var(--ink-muted);
       text-decoration: none;
-      transition: color 0.3s;
+      transition: color 0.2s;
+      align-self: flex-start;
+    }
+    .project-link:hover { color: var(--ink); }
+    .timeline-project--featured {
+      background: var(--ink);
+      padding: 2rem;
+    }
+    .timeline-project--featured .project-num,
+    .timeline-project--featured .project-award,
+    .timeline-project--featured .project-title,
+    .timeline-project--featured .project-desc,
+    .timeline-project--featured .project-link { color: var(--paper); }
+    .timeline-project--featured .project-tags span {
+      border-color: rgba(245,243,239,0.25);
+      color: rgba(245,243,239,0.6);
+    }
+    .timeline-project--featured .project-award--highlight { color: var(--paper); }
+    .project-award--highlight {
+      color: var(--ink);
+      font-size: 0.62rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .project-award--highlight::before {
+      content: '★';
+      font-size: 0.9rem;
+      line-height: 1;
+      flex-shrink: 0;
     }
 
     /* Skills */
@@ -597,8 +661,12 @@
       section { padding: 5rem 2rem; }
       .about-grid { grid-template-columns: 1fr; gap: 3rem; }
       .about-aside { position: static; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .project-card--wide { grid-column: auto; }
+      .timeline::before { display: none; }
+      .timeline-group { grid-template-columns: 1fr; }
+      .timeline-year-label { text-align: left; padding-right: 0; margin-bottom: 1.5rem; }
+      .timeline-year-label::after { display: none; }
+      .timeline-projects { padding-left: 0; }
+      .timeline-project { grid-template-columns: 1fr; }
       .skills-layout { grid-template-columns: 1fr; }
       .skill-group { border-right: none; border-bottom: 1px solid var(--line); }
       .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
@@ -698,65 +766,107 @@
       <span class="section-num">02</span>
       <h2 class="section-title">Selected <em>Work</em></h2>
     </div>
-    <div class="projects-grid">
+    <div class="timeline">
 
-      <div class="project-card reveal">
-        <p class="project-num">01 / 2024</p>
-        <p class="project-award">ARKO Public Art Project 2023–2024</p>
-        <h3 class="project-title">Memorial <em>Shower</em></h3>
-        <p class="project-desc">A 2D platformer adapting Korean filmmaker Lim Heung-soon's film — a journey through memory and cultural identity set on Jeju Island. Built character shaders with layered outline and deformation effects, NPC interaction systems, atmospheric real-time VFX (rain, snow, wind, water), and handled full graphics optimization for stable performance.</p>
-        <div class="project-tags">
-          <span>Unity</span><span>Shader Graph</span><span>C#</span><span>Blender</span><span>VFX</span><span>Photoshop</span>
+      <!-- 2024 -->
+      <div class="timeline-group reveal">
+        <span class="timeline-year-label">2024</span>
+        <div class="timeline-projects">
+          <div class="timeline-project" data-effect="rain">
+            <div class="project-visual">
+              <img src="https://res.cloudinary.com/dpnsfysve/image/upload/v1774254239/4f5d97e3-8aea-413b-a194-3e4a5ea63144_jfzfjc.png" alt="Memorial Shower" />
+              <canvas class="project-canvas"></canvas>
+            </div>
+            <div class="project-info">
+              <p class="project-num">01 / 2024</p>
+              <p class="project-award">ARKO Public Art Project 2023–2024</p>
+              <h3 class="project-title">Memorial <em>Shower</em></h3>
+              <p class="project-desc">A 2D platformer adapting Korean filmmaker Lim Heung-soon's film — a journey through memory and cultural identity set on Jeju Island. Built character shaders with layered outline and deformation effects, NPC interaction systems, atmospheric real-time VFX (rain, snow, wind, water), and handled full graphics optimization for stable performance.</p>
+              <div class="project-tags">
+                <span>Unity</span><span>Shader Graph</span><span>C#</span><span>Blender</span><span>VFX</span><span>Photoshop</span>
+              </div>
+              <a href="https://drive.google.com/file/d/1gzL9pJuwwD534WxT99KXBoNHhp2LAga8/view" target="_blank" class="project-link">Gameplay demo →</a>
+            </div>
+          </div>
         </div>
-        <a href="https://drive.google.com/file/d/1gzL9pJuwwD534WxT99KXBoNHhp2LAga8/view" target="_blank" class="project-link">Gameplay demo →</a>
-        <div class="project-bar"></div>
       </div>
 
-      <div class="project-card reveal">
-        <p class="project-num">02 / 2023</p>
-        <p class="project-award">Winner — Korea Metaverse Dev Contest, Ministry of Science &amp; ICT</p>
-        <h3 class="project-title">Space <em>Cleaners</em></h3>
-        <p class="project-desc">A VR game that puts players in a Space Plogging Championship — collecting cosmic debris to protect alien worlds from environmental hazards. Led art direction across 3D asset production, UI design, player interaction design, and the official game trailer.</p>
-        <div class="project-tags">
-          <span>Unity</span><span>C#</span><span>Blender</span><span>ZBrush</span><span>VR</span><span>Illustrator</span>
+      <!-- 2023 -->
+      <div class="timeline-group reveal">
+        <span class="timeline-year-label">2023</span>
+        <div class="timeline-projects">
+          <div class="timeline-project timeline-project--featured" data-effect="orbit">
+            <div class="project-visual">
+              <img src="https://res.cloudinary.com/dpnsfysve/image/upload/v1774254250/Monosnap_UserstachibisDocumentsMetacontestTrailerAlienBiusters.prproj__2023-10-20_14-30-05_j7gsqe.png" alt="Space Cleaners" />
+              <canvas class="project-canvas"></canvas>
+            </div>
+            <div class="project-info">
+              <p class="project-num">02 / 2023</p>
+              <p class="project-award project-award--highlight">Winner — Korea Metaverse Dev Contest, Ministry of Science &amp; ICT</p>
+              <h3 class="project-title">Space <em>Cleaners</em></h3>
+              <p class="project-desc">A VR game that puts players in a Space Plogging Championship — collecting cosmic debris to protect alien worlds from environmental hazards. Led art direction across 3D asset production, UI design, player interaction design, and the official game trailer.</p>
+              <div class="project-tags">
+                <span>Unity</span><span>C#</span><span>Blender</span><span>ZBrush</span><span>VR</span><span>Illustrator</span>
+              </div>
+              <a href="https://www.youtube.com/watch?v=tM7PPVZbbYw" target="_blank" class="project-link">Game trailer →</a>
+            </div>
+          </div>
+          <div class="timeline-project" data-effect="wave">
+            <div class="project-visual">
+              <img src="https://res.cloudinary.com/dpnsfysve/image/upload/v1774256136/NoraeVerse_dark_mioojy.png" alt="NoraeVerse" />
+              <canvas class="project-canvas"></canvas>
+            </div>
+            <div class="project-info">
+              <p class="project-num">03 / 2023</p>
+              <p class="project-award">2nd Place — Daejeon Startup Education Program "Start Small, Aim High"</p>
+              <h3 class="project-title">Norae<em>Verse</em></h3>
+              <p class="project-desc">A VR karaoke platform combining immersive social spaces, real-time AI vocal coaching, and play-to-earn mechanics — designed to bring Korean karaoke culture to a global audience. Led a team of 4 as CEO: proposed the core concept, developed the business model, conducted market research, and drove global expansion strategy.</p>
+              <div class="project-tags">
+                <span>VR</span><span>AI</span><span>Metaverse</span><span>Business Design</span><span>Market Analysis</span>
+              </div>
+              <a href="https://daily.hankooki.com/news/articleView.html?idxno=1009386" target="_blank" class="project-link">Media coverage →</a>
+            </div>
+          </div>
         </div>
-        <a href="https://www.youtube.com/watch?v=tM7PPVZbbYw" target="_blank" class="project-link">Game trailer →</a>
-        <div class="project-bar"></div>
       </div>
 
-      <div class="project-card reveal">
-        <p class="project-num">03 / 2021</p>
-        <p class="project-award">Finalist — ACM CHI'22 Student Game Competition</p>
-        <h3 class="project-title">NERO: <em>Forgotten Emotions</em></h3>
-        <p class="project-desc">A 2D platformer that uses real-time heart-rate as an emotion input to control in-game characters — prioritizing felt emotional experience over sensor precision. Proposed the original HCI concept, designed and animated all characters, and implemented an alternative biometric sensor solution to overcome hardware constraints.</p>
-        <div class="project-tags">
-          <span>Unity</span><span>C#</span><span>HCI</span><span>Signal Processing</span><span>Photoshop</span>
+      <!-- 2021 -->
+      <div class="timeline-group reveal">
+        <span class="timeline-year-label">2021</span>
+        <div class="timeline-projects">
+          <div class="timeline-project timeline-project--featured" data-effect="heartbeat">
+            <div class="project-visual">
+              <img src="https://res.cloudinary.com/dpnsfysve/image/upload/v1774254230/Monosnap_Showcase_1_Team_4_-_Google_%D0%9F%D1%80%D0%B5%D0%B7%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B8_2025-03-15_14-28-23_ksnub2.png" alt="NERO: Forgotten Emotions" />
+              <canvas class="project-canvas"></canvas>
+            </div>
+            <div class="project-info">
+              <p class="project-num">04 / 2021</p>
+              <p class="project-award project-award--highlight">Finalist — ACM CHI'22 Student Game Competition</p>
+              <h3 class="project-title">NERO: <em>Forgotten Emotions</em></h3>
+              <p class="project-desc">A 2D platformer that uses real-time heart-rate as an emotion input to control in-game characters — prioritizing felt emotional experience over sensor precision. Proposed the original HCI concept, designed and animated all characters, and implemented an alternative biometric sensor solution to overcome hardware constraints.</p>
+              <div class="project-tags">
+                <span>Unity</span><span>C#</span><span>HCI</span><span>Signal Processing</span><span>Photoshop</span>
+              </div>
+              <a href="https://dl.acm.org/doi/abs/10.1145/3491101.3516485" target="_blank" class="project-link">Read paper →</a>
+            </div>
+          </div>
+          <div class="timeline-project" data-effect="fractal">
+            <div class="project-visual">
+              <img src="https://res.cloudinary.com/dpnsfysve/image/upload/v1774254341/Monosnap_%D0%94%D0%B8%D0%BF%D0%BB%D0%BE%D0%BC__1.pdf_2025-03-15_17-50-08_xlz9a2.png" alt="Fractal Modeling" />
+              <canvas class="project-canvas"></canvas>
+            </div>
+            <div class="project-info">
+              <p class="project-num">05 / 2021</p>
+              <p class="project-award">Bachelor's Thesis — NRU Higher School of Economics</p>
+              <h3 class="project-title">Fractal Modeling for <em>Dynamic 3D VR</em></h3>
+              <p class="project-desc">A procedural generation module using fractal algorithms to create real-time landscapes, cities, trees, and abstract forms in Unity VR. Supplementary user studies measured cognitive response to rendering techniques via EKG and EDA sensors, in collaboration with the Center of Bio-Electrical Interfaces.</p>
+              <div class="project-tags">
+                <span>Unity</span><span>C#</span><span>HLSL</span><span>Procedural Generation</span><span>VR</span><span>Signal Processing</span>
+              </div>
+              <a href="https://github.com/chibisova/RMFractal/" target="_blank" class="project-link">GitHub repo →</a>
+            </div>
+          </div>
         </div>
-        <a href="https://dl.acm.org/doi/abs/10.1145/3491101.3516485" target="_blank" class="project-link">Read paper →</a>
-        <div class="project-bar"></div>
-      </div>
-
-      <div class="project-card reveal">
-        <p class="project-num">04 / 2021</p>
-        <p class="project-award">Bachelor's Thesis — NRU Higher School of Economics</p>
-        <h3 class="project-title">Fractal Modeling for <em>Dynamic 3D VR</em></h3>
-        <p class="project-desc">A procedural generation module using fractal algorithms to create real-time landscapes, cities, trees, and abstract forms in Unity VR. Supplementary user studies measured cognitive response to rendering techniques via EKG and EDA sensors, in collaboration with the Center of Bio-Electrical Interfaces.</p>
-        <div class="project-tags">
-          <span>Unity</span><span>C#</span><span>HLSL</span><span>Procedural Generation</span><span>VR</span><span>Signal Processing</span>
-        </div>
-        <div class="project-bar"></div>
-      </div>
-
-      <div class="project-card project-card--wide reveal">
-        <p class="project-num">05 / 2023</p>
-        <p class="project-award">2nd Place — Daejeon Startup Education Program "Start Small, Aim High"</p>
-        <h3 class="project-title">Norae<em>Verse</em></h3>
-        <p class="project-desc">A VR karaoke platform combining immersive social spaces, real-time AI vocal coaching, and play-to-earn mechanics — designed to bring Korean karaoke culture to a global audience. Led a team of 4 as CEO: proposed the core concept, developed the business model, conducted market research, and drove global expansion strategy.</p>
-        <div class="project-tags">
-          <span>VR</span><span>AI</span><span>Metaverse</span><span>Business Design</span><span>Market Analysis</span>
-        </div>
-        <a href="https://www.youtube.com/watch?v=no3IDCCMInw" target="_blank" class="project-link">Media coverage →</a>
-        <div class="project-bar"></div>
       </div>
 
     </div>
@@ -997,6 +1107,178 @@
         requestAnimationFrame(loop);
       }
       loop();
+    })();
+
+    // Project canvas effects
+    (function () {
+      function makeEffect(type, canvas) {
+        const ctx = canvas.getContext('2d');
+        let raf = null;
+
+        function resize() {
+          const r = canvas.parentElement.getBoundingClientRect();
+          canvas.width = r.width;
+          canvas.height = r.height;
+        }
+
+        // --- Rain (Memorial Shower) ---
+        function rain() {
+          const drops = Array.from({ length: 90 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vy: 1.8 + Math.random() * 2.2,
+            vx: (Math.random() - 0.5) * 0.4,
+            len: 8 + Math.random() * 10,
+            op: 0.25 + Math.random() * 0.45
+          }));
+          return function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drops.forEach(d => {
+              ctx.beginPath();
+              ctx.moveTo(d.x, d.y);
+              ctx.lineTo(d.x - d.vx * 3, d.y - d.len);
+              ctx.strokeStyle = `rgba(245,243,239,${d.op})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+              d.x += d.vx; d.y += d.vy;
+              if (d.y > canvas.height + d.len) { d.y = -d.len; d.x = Math.random() * canvas.width; }
+            });
+          };
+        }
+
+        // --- Orbit (Space Cleaners) ---
+        function orbit() {
+          const t0 = Date.now();
+          const rings = [
+            { r: 28, speed: 0.9,  n: 3, size: 3.5 },
+            { r: 52, speed: -0.5, n: 5, size: 2.5 },
+            { r: 78, speed: 0.35, n: 7, size: 1.8 },
+            { r: 108, speed: -0.2, n: 11, size: 1.2 }
+          ];
+          return function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const t = (Date.now() - t0) * 0.001;
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            rings.forEach(ring => {
+              for (let i = 0; i < ring.n; i++) {
+                const a = (i / ring.n) * Math.PI * 2 + t * ring.speed;
+                ctx.beginPath();
+                ctx.arc(cx + Math.cos(a) * ring.r, cy + Math.sin(a) * ring.r, ring.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(245,243,239,0.75)';
+                ctx.fill();
+              }
+            });
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(245,243,239,0.5)';
+            ctx.fill();
+          };
+        }
+
+        // --- Sound waves (NoraeVerse) ---
+        function wave() {
+          const t0 = Date.now();
+          return function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const t = (Date.now() - t0) * 0.001;
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            const maxR = Math.hypot(cx, cy) * 1.1;
+            for (let i = 0; i < 6; i++) {
+              const phase = ((t * 0.5 + i / 6) % 1);
+              const r = phase * maxR;
+              const op = (1 - phase) * 0.55;
+              ctx.beginPath();
+              ctx.arc(cx, cy, r, 0, Math.PI * 2);
+              ctx.strokeStyle = `rgba(245,243,239,${op})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          };
+        }
+
+        // --- Heartbeat (NERO) ---
+        function heartbeat() {
+          let offset = 0;
+          function ecg(x) {
+            const p = ((x % 120) + 120) % 120;
+            if (p < 10) return 0;
+            if (p < 15) return (p - 10) / 5 * 0.15;
+            if (p < 20) return (20 - p) / 5 * 0.15;
+            if (p < 35) return 0;
+            if (p < 38) return -(p - 35) / 3 * 0.4;
+            if (p < 42) return -0.4 + (p - 38) / 4 * 1.4;
+            if (p < 46) return 1.0 - (p - 42) / 4 * 1.3;
+            if (p < 50) return -0.3 + (p - 46) / 4 * 0.3;
+            if (p < 70) return 0;
+            if (p < 80) return (p - 70) / 10 * 0.2;
+            if (p < 90) return 0.2 - (p - 80) / 10 * 0.2;
+            return 0;
+          }
+          return function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const W = canvas.width, H = canvas.height, cy = H / 2;
+            ctx.beginPath();
+            for (let x = 0; x <= W; x++) {
+              const y = cy - ecg(x + offset) * H * 0.38;
+              x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(245,243,239,0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            offset += 1.5;
+          };
+        }
+
+        // --- Fractal tree (Fractal Modeling) ---
+        function fractal() {
+          const t0 = Date.now();
+          function branch(x, y, len, angle, depth, t) {
+            if (depth === 0 || len < 2) return;
+            const sway = Math.sin(t + depth * 0.7) * 0.12;
+            const ex = x + Math.cos(angle + sway) * len;
+            const ey = y + Math.sin(angle + sway) * len;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(ex, ey);
+            ctx.strokeStyle = `rgba(245,243,239,${0.15 + depth * 0.08})`;
+            ctx.lineWidth = depth * 0.5;
+            ctx.stroke();
+            branch(ex, ey, len * 0.72, angle - 0.42, depth - 1, t);
+            branch(ex, ey, len * 0.72, angle + 0.42, depth - 1, t);
+          }
+          return function () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const t = (Date.now() - t0) * 0.001;
+            branch(canvas.width / 2, canvas.height, canvas.height * 0.27, -Math.PI / 2, 8, t);
+          };
+        }
+
+        const drawFns = { rain, orbit, wave, heartbeat, fractal };
+        let draw = null;
+
+        return {
+          start() {
+            resize();
+            if (raf) return;
+            draw = drawFns[type]();
+            function loop() { draw(); raf = requestAnimationFrame(loop); }
+            loop();
+          },
+          stop() {
+            if (raf) { cancelAnimationFrame(raf); raf = null; }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        };
+      }
+
+      document.querySelectorAll('.timeline-project').forEach(project => {
+        const canvas = project.querySelector('.project-canvas');
+        const type = project.dataset.effect;
+        if (!canvas || !type) return;
+        const effect = makeEffect(type, canvas);
+        project.addEventListener('mouseenter', () => effect.start());
+        project.addEventListener('mouseleave', () => effect.stop());
+      });
     })();
 
     // Scroll reveal
